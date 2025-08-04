@@ -1,0 +1,25 @@
+{
+  "name": "korean-ux-writing-tone-converter",
+  "version": "1.0.0",
+  "description": "한국어 텍스트를 친근한 UX Writing 톤으로 변경하는 Figma 플러그인",
+  "main": "code.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "keywords": [
+    "figma",
+    "plugin",
+    "korean",
+    "ux-writing",
+    "tone",
+    "텍스트",
+    "친근한톤"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.82.0",
+    "typescript": "^5.0.0"
+  }
+}
