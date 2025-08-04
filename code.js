@@ -1,148 +1,352 @@
 "use strict";
-// 한국어 UX Writing 친근한 톤 변환 규칙
-const toneConversionRules = {
-    // 존댓말 -> 친근한 톤
-    '확인해보세요': '확인하기',
-    '클릭하세요': '클릭하기',
-    '선택하세요': '선택하기',
-    '입력하세요': '입력하기',
-    '설정하세요': '설정하기',
-    '완료하세요': '완료하기',
-    '저장하세요': '저장하기',
-    '삭제하세요': '삭제하기',
-    '편집하세요': '편집하기',
-    '수정하세요': '수정하기',
-    '변경하세요': '변경하기',
-    '추가하세요': '추가하기',
-    '제거하세요': '제거하기',
-    '검색하세요': '검색하기',
-    '찾아보세요': '찾아보기',
-    '다운로드하세요': '다운로드',
-    '업로드하세요': '업로드',
-    '공유하세요': '공유하기',
-    '복사하세요': '복사하기',
-    '붙여넣으세요': '붙여넣기',
-    '새로고침하세요': '새로고침',
-    '로그인하세요': '로그인',
-    '로그아웃하세요': '로그아웃',
-    '회원가입하세요': '회원가입',
-    '계속하세요': '계속하기',
-    '시작하세요': '시작하기',
-    '종료하세요': '종료하기',
-    '취소하세요': '취소',
-    '닫으세요': '닫기',
-    '열어보세요': '열어보기',
-    '보내세요': '보내기',
-    '받으세요': '받기',
-    '연결하세요': '연결하기',
-    '해제하세요': '해제하기',
-    // 문장형 -> 간결한 형태
-    '버튼을 클릭하세요': '클릭하기',
-    '내용을 확인하세요': '내용 확인',
-    '파일을 선택하세요': '파일 선택',
-    '정보를 입력하세요': '정보 입력',
-    '설정을 변경하세요': '설정 변경',
-    '결과를 확인하세요': '결과 확인',
-    '데이터를 저장하세요': '데이터 저장',
-    '내용을 삭제하세요': '내용 삭제',
-    '이미지를 업로드하세요': '이미지 업로드',
-    '파일을 다운로드하세요': '파일 다운로드',
-    // 기타 자주 사용되는 표현
-    '자세히 보기': '더보기',
-    '자세한 내용': '상세정보',
-    '더 많은 정보': '추가정보',
-    '이전 페이지': '이전',
-    '다음 페이지': '다음',
-    '처음으로': '처음',
-    '마지막으로': '마지막',
-    '목록으로': '목록',
-    '홈으로': '홈',
-    '메인으로': '메인',
-    '돌아가기': '뒤로',
-    '새 창': '새창',
-    '팝업 닫기': '닫기',
-    '전체 선택': '모두 선택',
-    '선택 해제': '해제',
-    '필수 입력': '필수',
-    '선택 사항': '선택',
-    '추천합니다': '추천',
-    '권장합니다': '권장',
-};
-// 텍스트 변환 함수
-function convertToFriendlyTone(text) {
-    let convertedText = text;
-    // 정확한 매칭 우선 처리
-    for (const [formal, friendly] of Object.entries(toneConversionRules)) {
-        convertedText = convertedText.replace(new RegExp(formal, 'g'), friendly);
+// UX 톤 적용하기 - Figma 플러그인
+// 텍스트 분석 및 친근한 톤 변환 기능
+const toneRules = [
+    // 요구사항에 명시된 규칙들
+    {
+        pattern: '확인해보세요',
+        replacement: '확인하기',
+        description: '확인 액션을 친근하게',
+        category: 'formal-to-friendly'
+    },
+    {
+        pattern: '이용해보세요',
+        replacement: '이용하기',
+        description: '이용 권유를 친근하게',
+        category: 'formal-to-friendly'
+    },
+    {
+        pattern: /됩니다$/g,
+        replacement: '돼요',
+        description: '격식체를 친근체로',
+        category: 'ending'
+    },
+    {
+        pattern: /입니다$/g,
+        replacement: '이에요',
+        description: '격식체를 친근체로',
+        category: 'ending'
+    },
+    // 확장 가능한 추가 규칙들
+    {
+        pattern: '클릭하세요',
+        replacement: '클릭하기',
+        description: '클릭 액션을 친근하게',
+        category: 'command'
+    },
+    {
+        pattern: '선택하세요',
+        replacement: '선택하기',
+        description: '선택 액션을 친근하게',
+        category: 'command'
+    },
+    {
+        pattern: '입력하세요',
+        replacement: '입력하기',
+        description: '입력 액션을 친근하게',
+        category: 'command'
+    },
+    {
+        pattern: /하십시오$/g,
+        replacement: '하기',
+        description: '존댓말을 친근하게',
+        category: 'formal-to-friendly'
+    },
+    {
+        pattern: /해주세요$/g,
+        replacement: '하기',
+        description: '요청을 친근하게',
+        category: 'formal-to-friendly'
+    },
+    {
+        pattern: /습니다$/g,
+        replacement: '어요',
+        description: '격식체를 친근체로',
+        category: 'ending'
     }
-    // 패턴 기반 변환
-    // "~~세요" -> "~~기" (동사)
-    convertedText = convertedText.replace(/([가-힣]+)세요/g, (match, verb) => {
-        if (verb.endsWith('하')) {
-            return verb + '기';
+];
+// 문장 스타일 분석
+var SentenceStyle;
+(function (SentenceStyle) {
+    SentenceStyle["COMMAND"] = "command";
+    SentenceStyle["QUESTION"] = "question";
+    SentenceStyle["STATEMENT"] = "statement"; // 서술문
+})(SentenceStyle || (SentenceStyle = {}));
+// 감정 톤 분석
+var EmotionTone;
+(function (EmotionTone) {
+    EmotionTone["FRIENDLY"] = "friendly";
+    EmotionTone["PROFESSIONAL"] = "professional";
+    EmotionTone["FORMAL"] = "formal";
+    EmotionTone["CASUAL"] = "casual";
+})(EmotionTone || (EmotionTone = {}));
+// 텍스트 분석 클래스
+class TextAnalyzer {
+    // 문장 스타일 분석
+    static analyzeSentenceStyle(text) {
+        const trimmedText = text.trim();
+        if (trimmedText.endsWith('?') || trimmedText.includes('언제') ||
+            trimmedText.includes('어떻게') || trimmedText.includes('무엇')) {
+            return SentenceStyle.QUESTION;
         }
-        return verb + '기';
-    });
-    // "~~습니다" -> "~~해요"나 간결한 형태로
-    convertedText = convertedText.replace(/([가-힣]+)습니다/g, (match, verb) => {
-        return verb + '요';
-    });
-    // "~~입니다" -> "~~예요"
-    convertedText = convertedText.replace(/([가-힣]+)입니다/g, (match, noun) => {
-        return noun + '예요';
-    });
-    return convertedText;
-}
-// 메인 플러그인 로직
-figma.ui.onmessage = (msg) => {
-    if (msg.type === 'convert-tone') {
-        const selection = figma.currentPage.selection;
-        let convertedCount = 0;
-        // 선택된 요소들 중 텍스트 노드 찾기
-        function processNode(node) {
-            if (node.type === 'TEXT') {
-                const textNode = node;
-                const originalText = textNode.characters;
-                const convertedText = convertToFriendlyTone(originalText);
-                if (originalText !== convertedText) {
-                    // 폰트 로드 후 텍스트 변경
-                    figma.loadFontAsync(textNode.fontName).then(() => {
-                        textNode.characters = convertedText;
-                        convertedCount++;
-                    });
-                }
+        if (trimmedText.includes('하세요') || trimmedText.includes('하십시오') ||
+            trimmedText.includes('해주세요') || trimmedText.includes('하기')) {
+            return SentenceStyle.COMMAND;
+        }
+        return SentenceStyle.STATEMENT;
+    }
+    // 감정 톤 분석
+    static analyzeEmotionTone(text) {
+        const formalPatterns = ['습니다', '됩니다', '입니다', '하십시오'];
+        const friendlyPatterns = ['해요', '이에요', '돼요', '하기'];
+        const professionalPatterns = ['확인', '검토', '승인', '처리'];
+        let formalScore = 0;
+        let friendlyScore = 0;
+        let professionalScore = 0;
+        formalPatterns.forEach(pattern => {
+            formalScore += (text.match(new RegExp(pattern, 'g')) || []).length;
+        });
+        friendlyPatterns.forEach(pattern => {
+            friendlyScore += (text.match(new RegExp(pattern, 'g')) || []).length;
+        });
+        professionalPatterns.forEach(pattern => {
+            professionalScore += (text.match(new RegExp(pattern, 'g')) || []).length;
+        });
+        if (formalScore > friendlyScore && formalScore > 0) {
+            return EmotionTone.FORMAL;
+        }
+        else if (friendlyScore > 0) {
+            return EmotionTone.FRIENDLY;
+        }
+        else if (professionalScore > 0) {
+            return EmotionTone.PROFESSIONAL;
+        }
+        return EmotionTone.CASUAL;
+    }
+    // 키워드 추출 및 빈도 분석
+    static extractKeywords(text) {
+        // 한국어 조사, 어미 등을 제외한 의미있는 단어 추출
+        const stopWords = ['을', '를', '이', '가', '에', '의', '와', '과', '로', '으로', '에서', '부터', '까지'];
+        const words = text.split(/\s+/)
+            .filter(word => word.length > 1)
+            .filter(word => !stopWords.includes(word))
+            .map(word => word.replace(/[^\w가-힣]/g, ''));
+        const frequency = {};
+        words.forEach(word => {
+            if (word) {
+                frequency[word] = (frequency[word] || 0) + 1;
             }
-            else if ('children' in node) {
-                // 자식 노드들도 재귀적으로 처리
-                for (const child of node.children) {
-                    processNode(child);
+        });
+        const keywords = Object.keys(frequency)
+            .sort((a, b) => frequency[b] - frequency[a])
+            .slice(0, 5); // 상위 5개 키워드
+        return { keywords, frequency };
+    }
+    // 적용 가능한 규칙 찾기
+    static findApplicableRules(text) {
+        const applicableRules = [];
+        toneRules.forEach(rule => {
+            const matches = [];
+            let preview = text;
+            if (typeof rule.pattern === 'string') {
+                if (text.includes(rule.pattern)) {
+                    matches.push(rule.pattern);
+                    preview = text.replace(new RegExp(rule.pattern, 'g'), rule.replacement);
                 }
-            }
-        }
-        if (selection.length === 0) {
-            figma.notify('텍스트 노드를 선택해주세요! 🙋‍♀️');
-            return;
-        }
-        for (const node of selection) {
-            processNode(node);
-        }
-        // 결과 알림
-        setTimeout(() => {
-            if (convertedCount > 0) {
-                figma.notify(`${convertedCount}개의 텍스트가 친근한 톤으로 변경되었습니다! ✨`);
             }
             else {
-                figma.notify('변경할 텍스트가 없습니다. 다른 텍스트를 선택해보세요! 🤔');
+                const regexMatches = text.match(rule.pattern);
+                if (regexMatches) {
+                    matches.push(...regexMatches);
+                    preview = text.replace(rule.pattern, rule.replacement);
+                }
             }
-        }, 100);
+            if (matches.length > 0) {
+                applicableRules.push({
+                    rule,
+                    matches,
+                    preview
+                });
+            }
+        });
+        return applicableRules;
     }
-    else if (msg.type === 'cancel') {
-        figma.closePlugin();
+    // UX 톤 프로파일 생성
+    static createUXToneProfile(text, emotionTone) {
+        const formalIndicators = ['습니다', '됩니다', '입니다', '하십시오'];
+        const friendlyIndicators = ['해요', '이에요', '돼요', '하기'];
+        let formalityLevel = 0;
+        let friendlinessScore = 0;
+        formalIndicators.forEach(indicator => {
+            formalityLevel += (text.match(new RegExp(indicator, 'g')) || []).length * 20;
+        });
+        friendlyIndicators.forEach(indicator => {
+            friendlinessScore += (text.match(new RegExp(indicator, 'g')) || []).length * 25;
+        });
+        formalityLevel = Math.min(formalityLevel, 100);
+        friendlinessScore = Math.min(friendlinessScore, 100);
+        const improvementAreas = [];
+        if (formalityLevel > 60)
+            improvementAreas.push('격식체를 친근체로 변경');
+        if (friendlinessScore < 40)
+            improvementAreas.push('더 친근한 표현 사용');
+        if (text.includes('하세요'))
+            improvementAreas.push('명령조를 권유조로 변경');
+        return {
+            currentTone: emotionTone,
+            recommendedTone: EmotionTone.FRIENDLY,
+            friendlinessScore,
+            formalityLevel,
+            improvementAreas
+        };
+    }
+    // 전체 텍스트 분석
+    static analyzeText(text) {
+        const sentenceStyle = this.analyzeSentenceStyle(text);
+        const emotionTone = this.analyzeEmotionTone(text);
+        const { keywords, frequency } = this.extractKeywords(text);
+        const applicableRules = this.findApplicableRules(text);
+        const uxToneProfile = this.createUXToneProfile(text, emotionTone);
+        return {
+            text,
+            sentenceStyle,
+            emotionTone,
+            keywords,
+            keywordFrequency: frequency,
+            applicableRules,
+            uxToneProfile
+        };
+    }
+}
+// 톤 변환 적용 클래스
+class ToneConverter {
+    static applyToneRules(text, selectedRules) {
+        let convertedText = text;
+        const rulesToApply = selectedRules || toneRules;
+        rulesToApply.forEach(rule => {
+            if (typeof rule.pattern === 'string') {
+                convertedText = convertedText.replace(new RegExp(rule.pattern, 'g'), rule.replacement);
+            }
+            else {
+                convertedText = convertedText.replace(rule.pattern, rule.replacement);
+            }
+        });
+        return convertedText;
+    }
+}
+// 메인 플러그인 로직
+let currentAnalysis = null;
+// UI로부터 메시지 처리
+figma.ui.onmessage = async (msg) => {
+    try {
+        switch (msg.type) {
+            case 'analyze-text':
+                await handleAnalyzeText();
+                break;
+            case 'apply-tone':
+                await handleApplyTone(msg.selectedRules);
+                break;
+            case 'apply-all-rules':
+                await handleApplyAllRules();
+                break;
+            case 'close':
+                figma.closePlugin();
+                break;
+            default:
+                console.warn('Unknown message type:', msg.type);
+        }
+    }
+    catch (error) {
+        console.error('Error handling message:', error);
+        figma.notify('오류가 발생했습니다. 다시 시도해주세요.', { error: true });
     }
 };
-// 플러그인 시작 시 UI 표시
-figma.showUI(__html__, { width: 320, height: 200 });
-// 선택 변경 시 UI에 정보 전달
+// 텍스트 분석 처리
+async function handleAnalyzeText() {
+    const selection = figma.currentPage.selection;
+    if (selection.length === 0) {
+        figma.ui.postMessage({
+            type: 'error',
+            message: '텍스트 노드를 선택해주세요.'
+        });
+        return;
+    }
+    const textNodes = [];
+    // 선택된 노드에서 텍스트 노드 수집
+    function collectTextNodes(node) {
+        if (node.type === 'TEXT') {
+            textNodes.push(node);
+        }
+        else if ('children' in node) {
+            for (const child of node.children) {
+                collectTextNodes(child);
+            }
+        }
+    }
+    selection.forEach(collectTextNodes);
+    if (textNodes.length === 0) {
+        figma.ui.postMessage({
+            type: 'error',
+            message: '선택된 요소에 텍스트 노드가 없습니다.'
+        });
+        return;
+    }
+    // 모든 텍스트 결합하여 분석
+    const combinedText = textNodes.map(node => node.characters).join(' ');
+    currentAnalysis = TextAnalyzer.analyzeText(combinedText);
+    figma.ui.postMessage({
+        type: 'analysis-complete',
+        analysis: currentAnalysis,
+        textNodeCount: textNodes.length
+    });
+}
+// 선택된 규칙 적용
+async function handleApplyTone(selectedRuleIndices) {
+    if (!currentAnalysis) {
+        figma.notify('먼저 텍스트를 분석해주세요.');
+        return;
+    }
+    const selection = figma.currentPage.selection;
+    const textNodes = [];
+    function collectTextNodes(node) {
+        if (node.type === 'TEXT') {
+            textNodes.push(node);
+        }
+        else if ('children' in node) {
+            for (const child of node.children) {
+                collectTextNodes(child);
+            }
+        }
+    }
+    selection.forEach(collectTextNodes);
+    let selectedRules = [];
+    if (selectedRuleIndices && selectedRuleIndices.length > 0) {
+        selectedRules = selectedRuleIndices.map(index => currentAnalysis.applicableRules[index].rule);
+    }
+    else {
+        selectedRules = currentAnalysis.applicableRules.map(ar => ar.rule);
+    }
+    let convertedCount = 0;
+    for (const textNode of textNodes) {
+        const originalText = textNode.characters;
+        const convertedText = ToneConverter.applyToneRules(originalText, selectedRules);
+        if (originalText !== convertedText) {
+            await figma.loadFontAsync(textNode.fontName);
+            textNode.characters = convertedText;
+            convertedCount++;
+        }
+    }
+    figma.notify(`${convertedCount}개의 텍스트가 친근한 톤으로 변경되었습니다! ✨`);
+    // 변경 후 재분석
+    await handleAnalyzeText();
+}
+// 모든 규칙 적용
+async function handleApplyAllRules() {
+    await handleApplyTone();
+}
+// 플러그인 시작
+figma.showUI(__html__, { width: 400, height: 600 });
+// 선택 변경 시 자동 분석
 figma.on('selectionchange', () => {
     const selection = figma.currentPage.selection;
     let textNodeCount = 0;
@@ -156,12 +360,10 @@ figma.on('selectionchange', () => {
             }
         }
     }
-    for (const node of selection) {
-        countTextNodes(node);
-    }
+    selection.forEach(countTextNodes);
     figma.ui.postMessage({
         type: 'selection-change',
-        textNodeCount: textNodeCount,
+        textNodeCount,
         totalSelected: selection.length
     });
 });

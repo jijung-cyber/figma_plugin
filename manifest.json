@@ -1,6 +1,6 @@
 {
-  "name": "Korean UX Writing Tone Converter",
-  "id": "korean-ux-writing-tone-converter",
+  "name": "ux톤 적용하기",
+  "id": "ux-tone-applier",
   "api": "1.0.0",
   "main": "code.js",
   "ui": "ui.html",
@@ -11,8 +11,8 @@
   },
   "menu": [
     {
-      "name": "친근한 톤으로 변경",
-      "command": "convert-tone"
+      "name": "ux톤 적용하기",
+      "command": "apply-ux-tone"
     }
   ]
 }

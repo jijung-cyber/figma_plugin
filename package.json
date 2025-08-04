@@ -1,25 +1,29 @@
 {
-  "name": "korean-ux-writing-tone-converter",
+  "name": "ux-tone-applier",
   "version": "1.0.0",
-  "description": "한국어 텍스트를 친근한 UX Writing 톤으로 변경하는 Figma 플러그인",
+  "description": "UX Writing 친근한 톤 분석 및 적용 Figma 플러그인",
   "main": "code.js",
   "scripts": {
     "build": "tsc",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix"
   },
   "keywords": [
     "figma",
     "plugin",
-    "korean",
     "ux-writing",
-    "tone",
-    "텍스트",
-    "친근한톤"
+    "tone-analysis",
+    "korean",
+    "text-analysis"
   ],
   "author": "Your Name",
   "license": "MIT",
   "devDependencies": {
     "@figma/plugin-typings": "^1.82.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
     "typescript": "^5.0.0"
   }
 }
