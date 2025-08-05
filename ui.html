@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ux톤 적용하기</title>
+    <style>
+        /* Shadcn-inspired CSS Variables */
+        :root {
+            --background: 0 0% 100%;
+            --foreground: 240 10% 3.9%;
+            --card: 0 0% 100%;
+            --card-foreground: 240 10% 3.9%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 240 10% 3.9%;
+            --primary: 240 5.9% 10%;
+            --primary-foreground: 0 0% 98%;
+            --secondary: 240 4.8% 95.9%;
+            --secondary-foreground: 240 5.9% 10%;
+            --muted: 240 4.8% 95.9%;
+            --muted-foreground: 240 3.8% 46.1%;
+            --accent: 240 4.8% 95.9%;
+            --accent-foreground: 240 5.9% 10%;
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 0 0% 98%;
+            --border: 240 5.9% 90%;
+            --input: 240 5.9% 90%;
+            --ring: 240 10% 3.9%;
+            --radius: 0.5rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', system-ui, sans-serif;
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .container {
+            padding: 16px;
+            max-width: 100%;
+        }
+
+        /* Header */
+        .header {
+            padding-bottom: 16px;
+            border-bottom: 1px solid hsl(var(--border));
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: hsl(var(--foreground));
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            font-size: 13px;
+            color: hsl(var(--muted-foreground));
+        }
+
+        /* Card Component */
+        .card {
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .card-header {
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: hsl(var(--card-foreground));
+            margin-bottom: 4px;
+        }
+
+        .card-description {
+            font-size: 12px;
+            color: hsl(var(--muted-foreground));
+        }
+
+        /* Button Component */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            rounded: var(--radius);
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            text-decoration: none;
+        }
+
+        .btn:disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .btn-primary {
+            background: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: hsl(var(--primary) / 0.9);
+        }
+
+        .btn-secondary {
+            background: hsl(var(--secondary));
+            color: hsl(var(--secondary-foreground));
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: hsl(var(--secondary) / 0.8);
+        }
+
+        .btn-outline {
+            border: 1px solid hsl(var(--border));
+            background: transparent;
+            color: hsl(var(--foreground));
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background: hsl(var(--accent));
+            color: hsl(var(--accent-foreground));
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        /* Badge Component */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 9999px;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .badge-default {
+            background: hsl(var(--secondary));
+            color: hsl(var(--secondary-foreground));
+        }
+
+        .badge-success {
+            background: #22c55e;
+            color: white;
+        }
+
+        .badge-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .badge-error {
+            background: hsl(var(--destructive));
+            color: hsl(var(--destructive-foreground));
+        }
+
+        /* Progress Bar */
+        .progress {
+            background: hsl(var(--secondary));
+            border-radius: 9999px;
+            height: 8px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress-bar {
+            background: hsl(var(--primary));
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        /* Tabs */
+        .tabs {
+            margin-bottom: 16px;
+        }
+
+        .tab-list {
+            display: flex;
+            border-bottom: 1px solid hsl(var(--border));
+            margin-bottom: 16px;
+        }
+
+        .tab-trigger {
+            padding: 8px 16px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: hsl(var(--muted-foreground));
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .tab-trigger.active {
+            color: hsl(var(--foreground));
+            border-bottom-color: hsl(var(--primary));
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Alert */
+        .alert {
+            padding: 12px;
+            border-radius: var(--radius);
+            border: 1px solid;
+            margin-bottom: 16px;
+            font-size: 13px;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-color: #93c5fd;
+            color: #1e40af;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            border-color: #86efac;
+            color: #166534;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-color: #fbbf24;
+            color: #92400e;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            border-color: #fca5a5;
+            color: #dc2626;
+        }
+
+        /* List */
+        .list {
+            list-style: none;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid hsl(var(--border));
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Checkbox */
+        .checkbox {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+        }
+
+        /* Status */
+        .status {
+            padding: 12px 16px;
+            background: hsl(var(--muted));
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .status-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .status-text {
+            font-size: 13px;
+            color: hsl(var(--muted-foreground));
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 12px;
+            background: hsl(var(--muted));
+            border-radius: var(--radius);
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: hsl(var(--foreground));
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: hsl(var(--muted-foreground));
+            margin-top: 2px;
+        }
+
+        /* Keywords */
+        .keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Responsive */
+        @media (max-width: 400px) {
+            .container {
+                padding: 12px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>ux톤 적용하기</h1>
+            <p>텍스트를 분석하고 친근한 UX Writing 톤으로 변환합니다</p>
+        </div>
+
+        <!-- Status -->
+        <div id="status" class="status">
+            <div class="status-icon">📝</div>
+            <div class="status-text">텍스트 노드를 선택하고 분석을 시작해보세요</div>
+        </div>
+
+        <!-- Error Alert -->
+        <div id="error-alert" class="alert alert-error hidden">
+            <div id="error-message"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="main-content" class="hidden">
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tab-list">
+                    <button class="tab-trigger active" data-tab="analysis">분석 결과</button>
+                    <button class="tab-trigger" data-tab="rules">톤 적용</button>
+                </div>
+
+                <!-- Analysis Tab -->
+                <div id="tab-analysis" class="tab-content active">
+                    <!-- UX Tone Profile -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">UX 톤 프로파일</div>
+                            <div class="card-description">현재 텍스트의 톤 분석 결과</div>
+                        </div>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value" id="friendliness-score">-</div>
+                                <div class="stat-label">친근함 점수</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="formality-level">-</div>
+                                <div class="stat-label">격식도 수준</div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <strong>현재 톤:</strong> <span class="badge badge-default" id="current-tone">-</span>
+                            <strong style="margin-left: 12px;">권장 톤:</strong> <span class="badge badge-success" id="recommended-tone">-</span>
+                        </div>
+
+                        <div style="margin-top: 12px;">
+                            <strong>개선 영역:</strong>
+                            <div id="improvement-areas" style="margin-top: 4px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Text Analysis -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">텍스트 분석</div>
+                            <div class="card-description">문장 스타일 및 키워드 분석</div>
+                        </div>
+                        
+                        <div style="margin-bottom: 12px;">
+                            <strong>문장 스타일:</strong> <span class="badge badge-default" id="sentence-style">-</span>
+                            <strong style="margin-left: 12px;">감정 톤:</strong> <span class="badge badge-default" id="emotion-tone">-</span>
+                        </div>
+
+                        <div>
+                            <strong>주요 키워드:</strong>
+                            <div id="keywords" class="keywords"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rules Tab -->
+                <div id="tab-rules" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">적용 가능한 규칙</div>
+                            <div class="card-description">선택하여 개별 적용하거나 모두 적용할 수 있습니다</div>
+                        </div>
+
+                        <div id="applicable-rules">
+                            <div class="alert alert-info">
+                                텍스트를 먼저 분석해주세요.
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 16px; display: flex; gap: 8px;">
+                            <button id="apply-selected-btn" class="btn btn-primary btn-sm" disabled>
+                                선택된 규칙 적용
+                            </button>
+                            <button id="apply-all-btn" class="btn btn-outline btn-sm" disabled>
+                                모든 규칙 적용
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="margin-top: 20px; display: flex; gap: 8px;">
+            <button id="analyze-btn" class="btn btn-primary btn-full" disabled>
+                텍스트 분석하기
+            </button>
+        </div>
+
+        <div style="margin-top: 8px; display: flex; gap: 8px;">
+            <button id="close-btn" class="btn btn-secondary btn-full">
+                닫기
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const statusEl = document.getElementById('status');
+        const errorAlertEl = document.getElementById('error-alert');
+        const errorMessageEl = document.getElementById('error-message');
+        const mainContentEl = document.getElementById('main-content');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const applySelectedBtn = document.getElementById('apply-selected-btn');
+        const applyAllBtn = document.getElementById('apply-all-btn');
+        const closeBtn = document.getElementById('close-btn');
+
+        // Profile elements
+        const friendlinessScoreEl = document.getElementById('friendliness-score');
+        const formalityLevelEl = document.getElementById('formality-level');
+        const currentToneEl = document.getElementById('current-tone');
+        const recommendedToneEl = document.getElementById('recommended-tone');
+        const improvementAreasEl = document.getElementById('improvement-areas');
+        const sentenceStyleEl = document.getElementById('sentence-style');
+        const emotionToneEl = document.getElementById('emotion-tone');
+        const keywordsEl = document.getElementById('keywords');
+        const applicableRulesEl = document.getElementById('applicable-rules');
+
+        // State
+        let currentAnalysis = null;
+        let selectedRules = [];
+
+        // Tab switching
+        document.querySelectorAll('.tab-trigger').forEach(trigger => {
+            trigger.addEventListener('click', () => {
+                const tabName = trigger.dataset.tab;
+                switchTab(tabName);
+            });
+        });
+
+        function switchTab(tabName) {
+            // Update triggers
+            document.querySelectorAll('.tab-trigger').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        // Event Listeners
+        analyzeBtn.addEventListener('click', () => {
+            parent.postMessage({ pluginMessage: { type: 'analyze-text' } }, '*');
+        });
+
+        applySelectedBtn.addEventListener('click', () => {
+            parent.postMessage({ 
+                pluginMessage: { 
+                    type: 'apply-tone', 
+                    selectedRules: selectedRules 
+                } 
+            }, '*');
+        });
+
+        applyAllBtn.addEventListener('click', () => {
+            parent.postMessage({ pluginMessage: { type: 'apply-all-rules' } }, '*');
+        });
+
+        closeBtn.addEventListener('click', () => {
+            parent.postMessage({ pluginMessage: { type: 'close' } }, '*');
+        });
+
+        // Handle messages from plugin
+        window.addEventListener('message', (event) => {
+            const msg = event.data.pluginMessage;
+            
+            switch (msg.type) {
+                case 'selection-change':
+                    handleSelectionChange(msg);
+                    break;
+                case 'analysis-complete':
+                    handleAnalysisComplete(msg);
+                    break;
+                case 'error':
+                    handleError(msg);
+                    break;
+            }
+        });
+
+        function handleSelectionChange(msg) {
+            const { textNodeCount, totalSelected } = msg;
+            
+            if (totalSelected === 0) {
+                updateStatus('📝', '텍스트 노드를 선택하고 분석을 시작해보세요');
+                analyzeBtn.disabled = true;
+                hideMainContent();
+            } else if (textNodeCount === 0) {
+                updateStatus('❌', `${totalSelected}개 선택됨 - 텍스트 노드가 없습니다`);
+                analyzeBtn.disabled = true;
+                hideMainContent();
+            } else {
+                updateStatus('✅', `${textNodeCount}개의 텍스트 노드가 선택되었습니다`);
+                analyzeBtn.disabled = false;
+                analyzeBtn.textContent = `${textNodeCount}개 텍스트 분석하기`;
+            }
+        }
+
+        function handleAnalysisComplete(msg) {
+            const { analysis, textNodeCount } = msg;
+            currentAnalysis = analysis;
+            
+            updateStatus('✨', `분석 완료! ${textNodeCount}개의 텍스트를 분석했습니다`);
+            showMainContent();
+            displayAnalysis(analysis);
+            hideError();
+        }
+
+        function handleError(msg) {
+            showError(msg.message);
+        }
+
+        function updateStatus(icon, text) {
+            statusEl.innerHTML = `
+                <div class="status-icon">${icon}</div>
+                <div class="status-text">${text}</div>
+            `;
+        }
+
+        function showMainContent() {
+            mainContentEl.classList.remove('hidden');
+            mainContentEl.classList.add('fade-in');
+        }
+
+        function hideMainContent() {
+            mainContentEl.classList.add('hidden');
+            currentAnalysis = null;
+        }
+
+        function showError(message) {
+            errorMessageEl.textContent = message;
+            errorAlertEl.classList.remove('hidden');
+        }
+
+        function hideError() {
+            errorAlertEl.classList.add('hidden');
+        }
+
+        function displayAnalysis(analysis) {
+            // UX Tone Profile
+            friendlinessScoreEl.textContent = `${analysis.uxToneProfile.friendlinessScore}점`;
+            formalityLevelEl.textContent = `${analysis.uxToneProfile.formalityLevel}점`;
+            currentToneEl.textContent = getToneLabel(analysis.uxToneProfile.currentTone);
+            recommendedToneEl.textContent = getToneLabel(analysis.uxToneProfile.recommendedTone);
+            
+            // Improvement areas
+            if (analysis.uxToneProfile.improvementAreas.length > 0) {
+                improvementAreasEl.innerHTML = analysis.uxToneProfile.improvementAreas
+                    .map(area => `<span class="badge badge-warning" style="margin-right: 4px; margin-bottom: 4px;">${area}</span>`)
+                    .join('');
+            } else {
+                improvementAreasEl.innerHTML = '<span class="badge badge-success">개선 사항 없음</span>';
+            }
+
+            // Text Analysis
+            sentenceStyleEl.textContent = getStyleLabel(analysis.sentenceStyle);
+            emotionToneEl.textContent = getToneLabel(analysis.emotionTone);
+            
+            // Keywords
+            if (analysis.keywords.length > 0) {
+                keywordsEl.innerHTML = analysis.keywords
+                    .map(keyword => `<span class="badge badge-default">${keyword}</span>`)
+                    .join('');
+            } else {
+                keywordsEl.innerHTML = '<span class="badge badge-default">키워드 없음</span>';
+            }
+
+            // Applicable Rules
+            displayApplicableRules(analysis.applicableRules);
+        }
+
+        function displayApplicableRules(rules) {
+            if (rules.length === 0) {
+                applicableRulesEl.innerHTML = '<div class="alert alert-info">적용 가능한 규칙이 없습니다.</div>';
+                applySelectedBtn.disabled = true;
+                applyAllBtn.disabled = true;
+                return;
+            }
+
+            const rulesHtml = rules.map((rule, index) => `
+                <div class="list-item">
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                            <input type="checkbox" class="checkbox" data-index="${index}">
+                            <strong>${rule.rule.description}</strong>
+                            <span class="badge badge-default" style="margin-left: 8px;">${rule.rule.category}</span>
+                        </div>
+                        <div style="font-size: 12px; color: hsl(var(--muted-foreground));">
+                            ${rule.matches.join(', ')} → ${rule.rule.replacement}
+                        </div>
+                        <div style="font-size: 11px; color: hsl(var(--muted-foreground)); margin-top: 2px;">
+                            미리보기: "${rule.preview}"
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            applicableRulesEl.innerHTML = `
+                <ul class="list">
+                    ${rulesHtml}
+                </ul>
+            `;
+
+            // Add event listeners for checkboxes
+            applicableRulesEl.querySelectorAll('.checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectedRules);
+            });
+
+            applyAllBtn.disabled = false;
+            updateSelectedRules(); // Initial state
+        }
+
+        function updateSelectedRules() {
+            selectedRules = [];
+            applicableRulesEl.querySelectorAll('.checkbox:checked').forEach(checkbox => {
+                selectedRules.push(parseInt(checkbox.dataset.index));
+            });
+            
+            applySelectedBtn.disabled = selectedRules.length === 0;
+            applySelectedBtn.textContent = selectedRules.length > 0 
+                ? `선택된 ${selectedRules.length}개 규칙 적용` 
+                : '선택된 규칙 적용';
+        }
+
+        function getToneLabel(tone) {
+            const labels = {
+                'friendly': '친근함',
+                'professional': '전문적',
+                'formal': '격식적',
+                'casual': '캐주얼'
+            };
+            return labels[tone] || tone;
+        }
+
+        function getStyleLabel(style) {
+            const labels = {
+                'command': '명령문',
+                'question': '의문문',
+                'statement': '서술문'
+            };
+            return labels[style] || style;
+        }
+    </script>
+</body>
+</html>
